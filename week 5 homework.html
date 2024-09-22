@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="src/styles.css" />
+    <title>Weather App</title>
+  </head>
+  <body>
+    <div class="container">
+      <div class="weather-app">
+        <form class="search-form" id="city-search-form">
+          <div class="row">
+            <div class="col-9">
+              <input
+                type="search"
+                id="city-input"
+                placeholder="Type a city.."
+                autofocus="on"
+                autocomplete="off"
+                class="form-control shadow-sm"
+              />
+            </div>
+            <div class="col-3">
+              <input
+                type="submit"
+                value="Search"
+                class="form-control btn btn-primary shadow-sm"
+              />
+            </div>
+          </div>
+        </form>
+
+        <h1 id="city-name">Sydney NSW, Australia</h1>
+        <ul>
+          <li id="current-time">Wednesday 22:00</li>
+          <li id="weather-description">Partly Cloudy</li>
+        </ul>
+
+        <div class="row">
+          <div class="col-6">
+            <div class="clearfix">
+              <img
+                src="https://ssl.gstatic.com/onebox/weather/64/partly_cloudy.png"
+                alt="Cloudy icon"
+                id="weather-icon"
+                class="weather-icon float-left"
+              />
+              <div class="float-left">
+                <span id="temperature">19</span><span class="units">°C</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-6">
+            <ul>
+              <li id="precipitation">Precipitation: 0%</li>
+              <li id="humidity">Humidity: 77%</li>
+              <li id="wind">Wind: 8 km/h</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function updateTime() {
+        const now = new Date();
+        const days = [
+          "Sunday",
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+        ];
+        const day = days[now.getDay()];
+        const hours = now.getHours().toString().padStart(2, "0");
+        const minutes = now.getMinutes().toString().padStart(2, "0");
+
+        const currentTime = `${day} ${hours}:${minutes}`;
+        document.getElementById("current-time").innerHTML = currentTime;
+      }
+
+      setInterval(updateTime, 60000);
+      updateTime();
+
+      async function fetchWeather(city) {
+        const apiKey = "your_api_key";
+        const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`;
+
+        try {
+          const response = await fetch(apiUrl);
+          if (!response.ok) {
+            throw new Error("City not found");
+          }
+          const data = await response.json();
+
+          document.getElementById("city-name").innerHTML = data.name;
+          document.getElementById("temperature").innerHTML = Math.round(
+            data.main.temp
+          );
+          document.getElementById("weather-description").innerHTML =
+            data.weather[0].description;
+          document.getElementById(
+            "humidity"
+          ).innerHTML = `Humidity: ${data.main.humidity}%`;
+          document.getElementById(
+            "wind"
+          ).innerHTML = `Wind: ${data.wind.speed} km/h`;
+
+          const iconCode = data.weather[0].icon;
+          document.getElementById(
+            "weather-icon"
+          ).src = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
+        } catch (error) {
+          alert(error.message);
+        }
+      }
+
+      document
+        .getElementById("city-search-form")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+          const cityInput = document.getElementById("city-input").value.trim();
+          if (cityInput) {
+            fetchWeather(cityInput);
+          }
+        });
+    </script>
+
+    <footer>
+      <p>
+        This project was coded by <strong>Buyisiwe prudence Mqoteni</strong> and
+        is on <a href="https://github.com">GitHub</a>.
+      </p>
+    </footer>
+  </body>
+</html>
